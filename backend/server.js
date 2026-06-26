@@ -41,8 +41,8 @@ app.get('/', (req, res) => {
 });
 
 // ===== ROUTES (we will add these one by one) =====
-// app.use('/api/auth',     require('./routes/auth'));
-// app.use('/api/resume',   require('./routes/resume'));
+ app.use('/api/auth',     require('./routes/auth'));
+app.use('/api/resume',   require('./routes/resume'));
 // app.use('/api/github',   require('./routes/github'));
 // app.use('/api/roadmap',  require('./routes/roadmap'));
 // app.use('/api/jobs',     require('./routes/jobs'));
