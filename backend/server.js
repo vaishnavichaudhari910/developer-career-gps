@@ -45,9 +45,9 @@ app.get('/', (req, res) => {
 app.use('/api/resume',   require('./routes/resume'));
 app.use('/api/github',   require('./routes/github'));
 app.use('/api/roadmap',  require('./routes/roadmap'));
-// app.use('/api/jobs',     require('./routes/jobs'));
- app.use('/api/progress', require('./routes/progress'));
 
+ app.use('/api/progress', require('./routes/progress'));
+app.use('/api/jobs',     require('./routes/jobs'));
 // Error Handler (must be last)
 app.use(errorHandler);
 
