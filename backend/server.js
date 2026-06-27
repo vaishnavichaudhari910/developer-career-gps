@@ -48,6 +48,9 @@ app.use('/api/roadmap',  require('./routes/roadmap'));
 
  app.use('/api/progress', require('./routes/progress'));
 app.use('/api/jobs',     require('./routes/jobs'));
+app.use('/api/coach',     require('./routes/coach'));      
+app.use('/api/interview', require('./routes/interview'));  
+app.use('/api/projects',  require('./routes/projects'));   
 // Error Handler (must be last)
 app.use(errorHandler);
 

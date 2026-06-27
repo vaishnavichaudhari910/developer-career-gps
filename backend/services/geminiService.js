@@ -304,3 +304,153 @@ Rules:
 
   return await callGemini(prompt);
 };
+// ────────────────────────────────────────────────────────
+// AI Career Coach Chat
+// ────────────────────────────────────────────────────────
+exports.chatWithCoach = async (messages, userContext) => {
+  const systemContext = `
+You are "GPS Coach", an expert developer career coach.
+User profile:
+- Name: ${userContext.name || 'Developer'}
+- Skills: ${userContext.skills?.join(', ') || 'Not provided'}
+- Role: ${userContext.role || 'fresher'}
+- Experience: ${userContext.experience || '0'} years
+- GitHub: ${userContext.githubUsername || 'Not connected'}
+
+Rules:
+- Give specific, actionable advice
+- Be encouraging but realistic
+- Keep answers concise (3-5 sentences)
+- No markdown formatting in response
+- Remember conversation context
+`;
+
+  // Build conversation history for Gemini
+  const contents = messages.map(msg => ({
+    role:  msg.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: msg.content }]
+  }));
+
+  // Add system context to first message
+  if (contents.length > 0) {
+    contents[0].parts[0].text =
+      systemContext + '\n\nUser: ' + contents[0].parts[0].text;
+  }
+
+  const response = await axios.post(GEMINI_URL, {
+    contents,
+    generationConfig: {
+      temperature:    0.7,
+      maxOutputTokens: 512,
+      thinkingConfig: { thinkingBudget: 0 }
+    }
+  });
+
+  return response.data.candidates[0].content.parts[0].text.trim();
+};
+
+// ────────────────────────────────────────────────────────
+// Generate Interview Questions
+// ────────────────────────────────────────────────────────
+exports.generateInterviewQuestions = async (targetRole, skills) => {
+  const prompt = `
+You are an expert technical interviewer.
+
+Target role: ${targetRole}
+Skills: ${skills.join(', ')}
+
+Generate interview questions and return ONLY valid JSON. No markdown.
+
+{
+  "hrQuestions": [
+    { "question": "<HR question>" }
+  ],
+  "technicalQuestions": [
+    {
+      "question": "<technical question>",
+      "difficulty": "<Easy | Medium | Hard>",
+      "topic": "<topic name>"
+    }
+  ],
+  "projectQuestions": [
+    { "question": "<project-based question>" }
+  ]
+}
+
+Rules:
+- Generate exactly 5 HR questions
+- Generate exactly 8 technical questions (mix of Easy/Medium/Hard)
+- Generate exactly 4 project questions
+- Technical questions must be specific to the skills provided
+- Return ONLY the JSON
+`;
+
+  return await callGemini(prompt);
+};
+
+// ────────────────────────────────────────────────────────
+// Evaluate Interview Answer
+// ────────────────────────────────────────────────────────
+exports.evaluateAnswer = async (question, answer, targetRole) => {
+  const prompt = `
+You are an expert technical interviewer for ${targetRole} role.
+
+Question: "${question}"
+Candidate's Answer: "${answer}"
+
+Evaluate the answer and return ONLY valid JSON. No markdown.
+
+{
+  "score": <number 0-10>,
+  "feedback": "<specific feedback on the answer>",
+  "idealAnswer": "<what a perfect answer would include>",
+  "grade": "<Poor | Average | Good | Excellent>"
+}
+
+Rules:
+- Score 0-10 based on accuracy, depth, clarity
+- Feedback must be specific and constructive
+- Return ONLY the JSON
+`;
+
+  return await callGemini(prompt);
+};
+
+// ────────────────────────────────────────────────────────
+// Generate Project Recommendations
+// ────────────────────────────────────────────────────────
+exports.generateProjectRecommendations = async (skills, targetRole, experience) => {
+  const prompt = `
+You are an expert developer mentor.
+
+Developer skills: ${skills.join(', ')}
+Target role: ${targetRole}
+Experience level: ${experience || 'fresher'}
+
+Recommend projects to build and return ONLY valid JSON. No markdown.
+
+{
+  "recommendations": [
+    {
+      "title": "<project name>",
+      "description": "<what the project does in 1 sentence>",
+      "techStack": ["tech1", "tech2", "tech3"],
+      "difficulty": "<Beginner | Intermediate | Advanced>",
+      "estimatedDays": <number>,
+      "features": ["feature1", "feature2", "feature3"],
+      "whyBuild": "<why this project helps career>",
+      "resumeImpact": "<how it looks on resume>"
+    }
+  ]
+}
+
+Rules:
+- Recommend exactly 6 projects
+- Mix of Beginner (2), Intermediate (3), Advanced (1)
+- Use skills the developer already knows
+- Projects must be practical and impressive for resume
+- Return ONLY the JSON
+`;
+
+  return await callGemini(prompt);
+};
