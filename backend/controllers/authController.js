@@ -41,37 +41,48 @@ exports.register = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Email already registered' });
     }
 
-    // Create user
-    const user = await User.create({ name, email, password });
+   // Create user
+const user = await User.create({ name, email, password });
 
-    // Generate verify token
-    const verifyToken = user.getVerifyToken();
-    await user.save({ validateBeforeSave: false });
+// ✅ Development mode: auto verify
+if (process.env.NODE_ENV === "development") {
+  user.isVerified = true;
+  await user.save({ validateBeforeSave: false });
 
-    // Send verification email
-    const verifyUrl = `${process.env.CLIENT_URL}/verify-email/${verifyToken}`;
-    await sendEmail({
-      to: email,
-      subject: 'Verify your Developer Career GPS account',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
-          <h2 style="color: #6366f1;">Welcome to Developer Career GPS 🚀</h2>
-          <p>Hi ${name}, thanks for registering!</p>
-          <p>Click the button below to verify your email address:</p>
-          <a href="${verifyUrl}"
-             style="background:#6366f1;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin:16px 0;">
-            Verify Email
-          </a>
-          <p>This link expires in 24 hours.</p>
-          <p>If you didn't register, ignore this email.</p>
-        </div>
-      `,
-    });
+  return res.status(201).json({
+    success: true,
+    message: "Registered successfully! You can now login."
+  });
+}
 
-    res.status(201).json({
-      success: true,
-      message: 'Registered successfully! Please check your email to verify your account.',
-    });
+// Production mode: email verification
+const verifyToken = user.getVerifyToken();
+await user.save({ validateBeforeSave: false });
+
+// Send verification email
+const verifyUrl = `${process.env.CLIENT_URL}/verify-email/${verifyToken}`;
+await sendEmail({
+  to: email,
+  subject: "Verify your Developer Career GPS account",
+  html: `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+      <h2 style="color: #6366f1;">Welcome to Developer Career GPS 🚀</h2>
+      <p>Hi ${name}, thanks for registering!</p>
+      <p>Click the button below to verify your email address:</p>
+      <a href="${verifyUrl}"
+         style="background:#6366f1;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin:16px 0;">
+        Verify Email
+      </a>
+      <p>This link expires in 24 hours.</p>
+      <p>If you didn't register, ignore this email.</p>
+    </div>
+  `,
+});
+
+res.status(201).json({
+  success: true,
+  message: "Registered successfully! Please check your email to verify your account.",
+});
   } catch (err) {
     next(err);
   }
@@ -112,38 +123,62 @@ exports.verifyEmail = async (req, res, next) => {
 // @route   POST /api/auth/login
 // @access  Public
 // ────────────────────────────────────────────────────────────
+// exports.login = async (req, res, next) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     // Validate input
+//     if (!email || !password) {
+//       return res.status(400).json({ success: false, message: 'Please provide email and password' });
+//     }
+
+//     // Find user and include password field
+//     const user = await User.findOne({ email }).select('+password');
+//     if (!user) {
+//       return res.status(401).json({ success: false, message: 'Invalid email or password' });
+//     }
+
+//     // Check password
+//     const isMatch = await user.matchPassword(password);
+//     if (!isMatch) {
+//       return res.status(401).json({ success: false, message: 'Invalid email or password' });
+//     }
+
+//     // Check if verified
+//     // if (!user.isVerified) {
+//     //   return res.status(401).json({ success: false, message: 'Please verify your email before logging in' });
+//     // }
+
+//     sendTokenResponse(user, 200, res);
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({ success: false, message: 'Please provide email and password' });
     }
 
-    // Find user and include password field
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
-    // Check password
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
-    // Check if verified
-    if (!user.isVerified) {
-      return res.status(401).json({ success: false, message: 'Please verify your email before logging in' });
-    }
-
+    // ✅ isVerified check nahi — direct login
     sendTokenResponse(user, 200, res);
+
   } catch (err) {
     next(err);
   }
 };
-
 // ────────────────────────────────────────────────────────────
 // @route   GET /api/auth/me
 // @access  Private
