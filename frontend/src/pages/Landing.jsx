@@ -5,6 +5,7 @@ import {
   Briefcase, MessageSquare, Mic, Star, CheckCircle,
   Menu, X, Zap, Target, Award, Moon, Sun
 } from 'lucide-react';
+import boyImage from "../assets/boy.png";
 
 // ── Dark Mode Hook ────────────────────────────────────────
 const useDarkMode = () => {
@@ -192,45 +193,86 @@ const Hero = () => {
   });
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-indigo-950 flex items-center pt-16">
-      <div className="max-w-6xl mx-auto px-6 py-20 text-center">
+   <section className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-indigo-950 flex items-center pt-16 overflow-hidden">
+  <div className="max-w-7xl mx-auto px-6 py-20">
+
+    <div className="grid lg:grid-cols-2 gap-12 items-center">
+
+      {/* LEFT CONTENT */}
+      <div>
 
         {/* Badge */}
-        <div style={fade(0)} className="inline-flex items-center gap-2 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-4 py-1.5 rounded-full text-sm font-medium mb-6">
-          <Zap className="w-3.5 h-3.5" />
+        <div
+          style={fade(0)}
+          className="inline-flex items-center gap-2 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-4 py-1.5 rounded-full text-sm font-medium mb-6"
+        >
+          <Zap className="w-4 h-4" />
           AI-Powered Career Platform for Developers
         </div>
 
-        {/* Headline */}
-        <h1 style={fade(100)} className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
+        {/* Heading */}
+        <h1
+          style={fade(100)}
+          className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-gray-900 dark:text-white mb-6"
+        >
           Your Personal
-          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">
+          <span className="block bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">
             Career GPS
           </span>
           for Developers
         </h1>
 
-        {/* Sub */}
-        <p style={fade(200)} className="text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-          Analyze your resume, decode your GitHub profile, generate AI roadmaps,
-          match with jobs, and practice interviews — all in one platform.
+        {/* Description */}
+        <p
+          style={fade(200)}
+          className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed mb-10 max-w-xl"
+        >
+          Analyze your resume, decode your GitHub profile, generate AI
+          roadmaps, match with jobs, and practice interviews — all in one
+          platform.
         </p>
 
-        {/* CTA */}
-        <div style={fade(300)} className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-          <Link to="/register"
-            className="flex items-center justify-center gap-2 px-8 py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-indigo-900 text-base"
-            style={{ transition: 'all 0.2s' }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 20px 40px rgba(99,102,241,0.4)'; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = ''; }}>
-            Start For Free <ArrowRight className="w-5 h-5" />
+        {/* Buttons */}
+        <div
+          style={fade(300)}
+          className="flex flex-wrap gap-4"
+        >
+          <Link
+            to="/register"
+            className="flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-semibold shadow-lg transition-all"
+          >
+            Start For Free
+            <ArrowRight className="w-5 h-5" />
           </Link>
-          <Link to="/login"
-            className="flex items-center justify-center gap-2 px-8 py-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm text-base"
-            style={{ transition: 'all 0.2s' }}>
+
+          <Link
+            to="/login"
+            className="flex items-center gap-2 px-8 py-4 border border-gray-300 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold"
+          >
             Sign In to Dashboard
           </Link>
         </div>
+
+      </div>
+
+      {/* RIGHT IMAGE */}
+      <div className="relative flex justify-center lg:justify-end">
+
+        {/* Background Blur */}
+        <div className="absolute w-[500px] h-[500px] rounded-full bg-indigo-500/10 blur-3xl"></div>
+
+        <img
+          src={boyImage}
+          alt="Developer"
+          className="relative z-10 w-full max-w-xl object-contain drop-shadow-2xl"
+        />
+
+      </div>
+
+    </div>
+
+  
+
 
         {/* Stats */}
         <div style={fade(400)} className="flex flex-wrap justify-center gap-8 md:gap-16 mb-16">
